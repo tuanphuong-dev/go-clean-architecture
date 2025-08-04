@@ -1,0 +1,36 @@
+# Binaries
+/bin/
+/out/
+
+# Build output
+*.exe
+*.dll
+*.so
+*.dylib
+
+# Go cache
+*.test
+*.out
+*.coverprofile
+*.cover.out
+
+# Dependency directories
+/vendor/
+
+# IDE/editor files
+.vscode/
+.idea/
+*.swp
+
+# Logs
+*.log
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Reports
+report.json
+coverage.out
+
+*.env

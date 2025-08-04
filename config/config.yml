@@ -1,0 +1,112 @@
+app:
+  name: "go-clean-arch"
+  version: "0.0.1"
+
+  # Runtime environment (e.g., "local", "development", "staging", "production")
+  # Override via ENV environment variable
+  #environment: "local"
+
+  # JWT token configuration
+  token_issuer: "go-clean-arch.demo" # JWT issuer claim for token validation
+
+  # Security token expiration settings
+  access_token_expires_in: "168h" # Access token valid for 7 days (168 hours)
+  refresh_token_expires_in: "720h" # Refresh token valid for 30 days (720 hours)
+
+  # Token secrets (set via environment variables for security)
+  # Set ACCESS_TOKEN_SECRET environment variable before starting the app
+  #access_token_secret: ""
+
+  # Set REFRESH_TOKEN_SECRET environment variable before starting the app
+  #refresh_token_secret: ""
+
+  # User session management
+  session_limit_per_user: 1 # Maximum concurrent sessions per user
+  user_session_limit_enabled: false # Toggle session limiting on/off
+
+server:
+  run_mode: "debug"
+  host: "0.0.0.0"
+  domain: "http://localhost:8000"
+  port: 8000
+  read_timeout: "60s"
+  write_timeout: "60s"
+
+otp:
+  expires_in: "5m"
+  retry_base_wait_time: "30s"
+  retry_max_wait_time: "5m"
+
+logger:
+  log_file_path: "./runtime/logs/"
+  log_file_name: "log"
+  timestamp_format: "20060102"
+  log_level: "debug"
+  file_extension: "log"
+  max_file_size_mb: 100
+  max_file_age_days: 200
+  max_backup_files: 30
+  enable_compressed: true
+
+redis:
+  # Redis connection settings (set via environment variables for security)
+  # Set REDIS_HOST environment variable (e.g., "localhost" or "redis.example.com")
+  #host: ""
+
+  # Set REDIS_PORT environment variable (default: 6379)
+  #port: ""
+
+  # Set REDIS_PASSWORD environment variable (leave empty if no auth required)
+  #password: ""
+
+  # Set REDIS_DB environment variable (database number, default: 0)
+  #db: ""
+
+  # Key prefix for all Redis keys (helps organize data and avoid conflicts)
+  prefix: ""
+
+cache:
+  provider: "redis" # `redis` or `memory`
+  default_ttl: "5m"
+
+upload:
+  # Upload provider configuration ("s3" or "local")
+  provider: "s3"
+
+  # Local storage settings (used when provider is "local")
+  local_dir: "./runtime/uploads"
+
+  # S3 configuration (used when provider is "s3")
+  s3_endpoint_url: "https://s3.sgp.io.cloud.ovh.net"
+  s3_bucket_name: "54vie-dev"
+  s3_path_prefix: "uploads"
+  s3_region: "sgp"
+  s3_presign_url_ttl: "10m" # Pre-signed URL valid for 10 minutes
+
+  # S3 credentials (set via environment variables for security)
+  # Set UPLOAD_S3_ACCESS_KEY environment variable before starting the app
+  #s3_access_key: ""
+
+  # Set UPLOAD_S3_SECRET_KEY environment variable before starting the app
+  #s3_secret_key: ""
+
+external:
+  # VietMap credentials (set via environment variables for security)
+  # Set VIETMAP_API_KEY environment variable before starting the app
+  #vietmap_api_key: ""
+
+  # Firebase service account configuration
+  # Path to Firebase service account JSON key file for authentication
+  # Ensure this file exists and has proper read permissions
+  firebase_account_key_path: "./config/serviceAccountKey.json"
+
+rpc:
+  host: "0.0.0.0"
+  port: 50051
+
+database:
+  max_open_conns: 25
+  max_idle_conns: 10
+  conn_max_lifetime: "5m"
+  enable_logging: true # Enable/disable database query logging
+  log_level: "warn" # Log level: silent, error, warn, info

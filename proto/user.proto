@@ -1,0 +1,130 @@
+syntax = "proto3";
+
+package userpb;
+
+option go_package = "proto/pb;pb";
+
+/***************************************
+*       User entities and types       *
+***************************************/
+message User {
+  string id = 1;
+  string email = 2;
+  string password = 3;
+  string first_name = 4;
+  string last_name = 5;
+  UserStatus status = 6;
+  int64 created_at = 7; // milli timestamp
+  int64 updated_at = 8; // milli timestamp
+  int64 deleted_at = 9; // milli timestamp
+}
+
+enum UserStatus {
+  USER_STATUS_UNSPECIFIED = 0;
+  USER_STATUS_WAITING_VERIFY = 1;
+  USER_STATUS_ACTIVE = 2;
+  USER_STATUS_BANNED = 3;
+}
+
+/**********************************************
+*       User usecase interfaces and types      *
+**********************************************/
+message CreateUserRequest {
+  string email = 1;
+  string password = 2;
+  string first_name = 3;
+  string last_name = 4;
+}
+
+message CreateUserResponse {
+  User user = 1;
+}
+
+message GetUserRequest {
+  string id = 1;
+}
+
+message GetUserResponse {
+  User user = 1;
+}
+
+message UpdateUserRequest {
+  string id = 1;
+  string email = 2;
+  string first_name = 3;
+  string last_name = 4;
+  UserStatus status = 5;
+}
+
+message UpdateUserResponse {
+  User user = 1;
+}
+
+message DeleteUserRequest {
+  string id = 1;
+}
+
+message DeleteUserResponse {
+  bool success = 1;
+}
+
+message ListUsersRequest {
+  int32 page = 1;
+  int32 per_page = 2;
+}
+
+message ListUsersResponse {
+  repeated User users = 1;
+  int32 total = 2;
+}
+
+message DetailError {
+  string id = 1;
+  int32 code = 2;
+  string status = 3;
+  string reason = 4;
+  string debug = 5;
+  string message = 6;
+  map<string, string> details = 7;
+}
+
+message FindOneOption {
+  repeated string preloads = 1;
+  repeated string sort = 2;
+}
+
+message UserFilter {
+  optional string id = 1;
+  optional string id_ne = 2;
+  repeated string id_in = 3;
+  optional string email = 4;
+  optional bool active = 5;
+  optional bool blocked = 6;
+  repeated string has_roles = 7;
+  optional string search_term = 8;
+  repeated string search_fields = 9;
+  optional bool include_deleted = 10;
+  optional FindOneOption option = 11;
+}
+
+message GetUserByFilterRequest {
+  optional UserFilter filter = 1;
+  optional FindOneOption option = 2;
+}
+
+message GetUserByIDRequest {
+  string id = 1;
+  optional FindOneOption option = 2;
+}
+
+/**********************************************
+*             User service                *
+**********************************************/
+service UserService {
+  rpc CreateUser (CreateUserRequest) returns (CreateUserResponse);
+  rpc GetUserByID (GetUserByIDRequest) returns (GetUserResponse);
+  rpc GetUserByFilter (GetUserByFilterRequest) returns (GetUserResponse);
+  rpc UpdateUser (UpdateUserRequest) returns (UpdateUserResponse);
+  rpc DeleteUser (DeleteUserRequest) returns (DeleteUserResponse);
+  rpc ListUsers (ListUsersRequest) returns (ListUsersResponse);
+}

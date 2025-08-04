@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Welcome to {{.app_name}}</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        line-height: 1.6;
+        color: #333;
+        max-width: 600px;
+        margin: 0 auto;
+        padding: 20px;
+      }
+      .header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 30px;
+        text-align: center;
+        border-radius: 8px 8px 0 0;
+      }
+      .content {
+        background: #f9f9f9;
+        padding: 30px;
+        border-radius: 0 0 8px 8px;
+      }
+      .button {
+        display: inline-block;
+        background: #667eea;
+        color: white;
+        padding: 12px 24px;
+        text-decoration: none;
+        border-radius: 5px;
+        margin: 20px 0;
+      }
+      .footer {
+        text-align: center;
+        margin-top: 30px;
+        color: #666;
+        font-size: 14px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="header">
+      <h1>🎉 Welcome to {{.app_name}}!</h1>
+    </div>
+    <div class="content">
+      <p>Hello <strong>{{.user_name}}</strong>,</p>
+
+      <p>Welcome to {{.app_name}}! We're excited to have you on board.</p>
+
+      <p>
+        Your account has been successfully created with the email address:
+        <strong>{{.user_email}}</strong>
+      </p>
+
+      <p>Here's what you can do next:</p>
+      <ul>
+        <li>Complete your profile setup</li>
+        <li>Explore our features</li>
+        <li>Connect with other users</li>
+      </ul>
+
+      <div style="text-align: center">
+        <a href="{{.app_url}}" class="button">Get Started</a>
+      </div>
+
+      <p>
+        If you have any questions, feel free to reach out to our support team.
+      </p>
+
+      <p>Best regards,<br />The {{.app_name}} Team</p>
+    </div>
+    <div class="footer">
+      <p>
+        This email was sent to {{.user_email}}. If you didn't create an account,
+        please ignore this email.
+      </p>
+      <p>&copy; {{.current_year}} {{.app_name}}. All rights reserved.</p>
+    </div>
+  </body>
+</html>
