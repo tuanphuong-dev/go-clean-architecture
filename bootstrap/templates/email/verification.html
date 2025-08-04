@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Verify Your Email - {{.app_name}}</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        line-height: 1.6;
+        color: #333;
+        max-width: 600px;
+        margin: 0 auto;
+        padding: 20px;
+      }
+      .header {
+        background: linear-gradient(135deg, #4caf50 0%, #45a049 100%);
+        color: white;
+        padding: 30px;
+        text-align: center;
+        border-radius: 8px 8px 0 0;
+      }
+      .content {
+        background: #f9f9f9;
+        padding: 30px;
+        border-radius: 0 0 8px 8px;
+      }
+      .verification-code {
+        background: #e8f5e8;
+        border: 2px dashed #4caf50;
+        padding: 20px;
+        text-align: center;
+        margin: 20px 0;
+        border-radius: 8px;
+      }
+      .code {
+        font-size: 32px;
+        font-weight: bold;
+        letter-spacing: 4px;
+        color: #2e7d32;
+        font-family: monospace;
+      }
+      .button {
+        display: inline-block;
+        background: #4caf50;
+        color: white;
+        padding: 12px 24px;
+        text-decoration: none;
+        border-radius: 5px;
+        margin: 20px 0;
+      }
+      .footer {
+        text-align: center;
+        margin-top: 30px;
+        color: #666;
+        font-size: 14px;
+      }
+      .warning {
+        background: #fff3cd;
+        border: 1px solid #ffeaa7;
+        padding: 15px;
+        border-radius: 5px;
+        margin: 20px 0;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="header">
+      <h1>📧 Verify Your Email Address</h1>
+    </div>
+    <div class="content">
+      <p>Hello <strong>{{.user_name}}</strong>,</p>
+
+      <p>
+        Thank you for registering with {{.app_name}}! To complete your account
+        setup, please verify your email address.
+      </p>
+
+      <div class="verification-code">
+        <p><strong>Your verification code is:</strong></p>
+        <div class="code">{{.verification_code}}</div>
+      </div>
+
+      <p>Enter this code in the verification form to activate your account.</p>
+
+      <div style="text-align: center">
+        <a href="{{.verification_url}}" class="button">Verify Email Address</a>
+      </div>
+
+      <div class="warning">
+        <p>
+          <strong>Important:</strong> This verification code will expire in
+          <strong>{{.expires_in}}</strong>.
+        </p>
+      </div>
+
+      <p>
+        If you didn't create an account with {{.app_name}}, please ignore this
+        email.
+      </p>
+
+      <p>Best regards,<br />The {{.app_name}} Team</p>
+    </div>
+    <div class="footer">
+      <p>This email was sent to {{.user_email}}.</p>
+      <p>
+        For security reasons, this verification link will expire in
+        {{.expires_in}}.
+      </p>
+      <p>&copy; {{.current_year}} {{.app_name}}. All rights reserved.</p>
+    </div>
+  </body>
+</html>

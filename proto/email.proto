@@ -1,0 +1,302 @@
+syntax = "proto3";
+
+package emailpb;
+
+option go_package = "proto/pb;pb";
+
+/***************************************
+*       Email entities and types       *
+***************************************/
+message EmailLog {
+  string id = 1;
+  repeated string to = 2;
+  repeated string cc = 3;
+  repeated string bcc = 4;
+  string subject = 5;
+  string content = 6;
+  string template = 7;
+  string data = 8; // JSON string
+  string status = 9;
+  string error_msg = 10;
+  int64 sent_at = 11;
+  string request_id = 12;
+  int32 retry_count = 13;
+  string headers = 14; // JSON string
+  string response = 15;
+  string provider = 16;
+  int32 total_recipients = 17;
+  string content_type = 18;
+  int32 attachment_count = 19;
+  int64 message_size = 20;
+  int64 created_at = 21;
+  int64 updated_at = 22;
+  int64 deleted_at = 23;
+}
+
+message EmailTemplate {
+  string id = 1;
+  string code = 2;
+  string name = 3;
+  string subject = 4;
+  string content = 5;
+  bool is_active = 6;
+  string description = 7;
+  string locale = 8;
+  int64 created_at = 9;
+  int64 updated_at = 10;
+  int64 deleted_at = 11;
+}
+
+message EmailAttachment {
+  string filename = 1;
+  bytes content = 2;
+  string content_type = 3;
+  bool inline = 4;
+  string content_id = 5;
+}
+
+/**********************************************
+*       Email service request/response       *
+**********************************************/
+message SendEmailRequest {
+  repeated string to = 1;
+  repeated string cc = 2;
+  repeated string bcc = 3;
+  string subject = 4;
+  string content = 5;
+  string content_type = 6;
+  repeated EmailAttachment attachments = 7;
+  map<string, string> headers = 8;
+  string provider = 9;
+  string request_id = 10;
+}
+
+message SendEmailResponse {
+  EmailLog email_log = 1;
+}
+
+message SendEmailWithTemplateRequest {
+  repeated string to = 1;
+  repeated string cc = 2;
+  repeated string bcc = 3;
+  string template_code = 4;
+  string locale = 5;
+  string data = 6; // JSON string
+  repeated EmailAttachment attachments = 7;
+  map<string, string> headers = 8;
+  string provider = 9;
+  string request_id = 10;
+}
+
+message SendEmailWithTemplateResponse {
+  EmailLog email_log = 1;
+}
+
+message BulkEmailRecipient {
+  string to = 1;
+  string data = 2; // JSON string
+}
+
+message SendBulkEmailRequest {
+  repeated BulkEmailRecipient recipients = 1;
+  string template_code = 2;
+  string locale = 3;
+  string provider = 4;
+  string request_id = 5;
+}
+
+message SendBulkEmailResponse {
+  repeated EmailLog email_logs = 1;
+}
+
+message ResendEmailRequest {
+  string email_log_id = 1;
+}
+
+message ResendEmailResponse {
+  EmailLog email_log = 1;
+}
+
+message CreateEmailTemplateRequest {
+  string code = 1;
+  string name = 2;
+  string subject = 3;
+  string content = 4;
+  string description = 5;
+  string locale = 6;
+  optional bool is_active = 7;
+}
+
+message CreateEmailTemplateResponse {
+  EmailTemplate template = 1;
+}
+
+message GetEmailTemplateRequest {
+  string template_id = 1;
+}
+
+message GetEmailTemplateResponse {
+  EmailTemplate template = 1;
+}
+
+message GetEmailTemplateByCodeRequest {
+  string code = 1;
+  string locale = 2;
+}
+
+message GetEmailTemplateByCodeResponse {
+  EmailTemplate template = 1;
+}
+
+message UpdateEmailTemplateRequest {
+  string template_id = 1;
+  optional string name = 2;
+  optional string subject = 3;
+  optional string content = 4;
+  optional string description = 5;
+  optional bool is_active = 6;
+}
+
+message UpdateEmailTemplateResponse {
+  EmailTemplate template = 1;
+}
+
+message DeleteEmailTemplateRequest {
+  string template_id = 1;
+}
+
+message DeleteEmailTemplateResponse {
+  bool success = 1;
+}
+
+message ListEmailTemplatesRequest {
+  int32 page = 1;
+  int32 per_page = 2;
+  optional string code = 3;
+  optional string locale = 4;
+  optional bool is_active = 5;
+  optional string search = 6;
+}
+
+message ListEmailTemplatesResponse {
+  repeated EmailTemplate templates = 1;
+  int32 total_items = 2;
+  int32 page = 3;
+  int32 per_page = 4;
+  int32 total_pages = 5;
+}
+
+message GetEmailLogRequest {
+  string email_log_id = 1;
+}
+
+message GetEmailLogResponse {
+  EmailLog email_log = 1;
+}
+
+message ListEmailLogsRequest {
+  int32 page = 1;
+  int32 per_page = 2;
+  optional string status = 3;
+  optional string provider = 4;
+  optional string template = 5;
+  optional string any_recipient = 6;
+  optional string search = 7;
+  optional int64 sent_after = 8;
+  optional int64 sent_before = 9;
+}
+
+message ListEmailLogsResponse {
+  repeated EmailLog email_logs = 1;
+  int32 total_items = 2;
+  int32 page = 3;
+  int32 per_page = 4;
+  int32 total_pages = 5;
+}
+
+message GetEmailStatsRequest {
+  optional string provider = 1;
+  optional string template = 2;
+  optional string status = 3;
+  optional int64 date_from = 4;
+  optional int64 date_to = 5;
+  optional string group_by = 6;
+  optional bool include_total = 7;
+}
+
+message EmailStatsGroup {
+  string key = 1;
+  string label = 2;
+  int64 count = 3;
+  int64 sent = 4;
+  int64 success = 5;
+  int64 failed = 6;
+  int64 pending = 7;
+  double rate = 8;
+}
+
+message EmailProviderStats {
+  string provider = 1;
+  int64 total_sent = 2;
+  int64 total_success = 3;
+  int64 total_failed = 4;
+  double success_rate = 5;
+  double avg_retry_count = 6;
+}
+
+message EmailTemplateStats {
+  string template = 1;
+  string code = 2;
+  int64 total_sent = 3;
+  int64 total_success = 4;
+  int64 total_failed = 5;
+  double success_rate = 6;
+  int64 last_used = 7;
+}
+
+message EmailStatsDateRange {
+  int64 from = 1;
+  int64 to = 2;
+}
+
+message EmailStats {
+  int64 total_sent = 1;
+  int64 total_success = 2;
+  int64 total_failed = 3;
+  int64 total_pending = 4;
+  double success_rate = 5;
+  double failure_rate = 6;
+  double avg_retry_count = 7;
+  repeated EmailStatsGroup grouped_stats = 8;
+  repeated EmailProviderStats provider_stats = 9;
+  repeated EmailTemplateStats template_stats = 10;
+  optional EmailStatsDateRange date_range = 11;
+}
+
+message GetEmailStatsResponse {
+  EmailStats stats = 1;
+}
+
+/**********************************************
+*             Email service               *
+**********************************************/
+service EmailService {
+  // Email sending operations
+  rpc SendEmail (SendEmailRequest) returns (SendEmailResponse);
+  rpc SendEmailWithTemplate (SendEmailWithTemplateRequest) returns (SendEmailWithTemplateResponse);
+  rpc SendBulkEmail (SendBulkEmailRequest) returns (SendBulkEmailResponse);
+  rpc ResendEmail (ResendEmailRequest) returns (ResendEmailResponse);
+  
+  // Email template operations
+  rpc CreateEmailTemplate (CreateEmailTemplateRequest) returns (CreateEmailTemplateResponse);
+  rpc GetEmailTemplate (GetEmailTemplateRequest) returns (GetEmailTemplateResponse);
+  rpc GetEmailTemplateByCode (GetEmailTemplateByCodeRequest) returns (GetEmailTemplateByCodeResponse);
+  rpc UpdateEmailTemplate (UpdateEmailTemplateRequest) returns (UpdateEmailTemplateResponse);
+  rpc DeleteEmailTemplate (DeleteEmailTemplateRequest) returns (DeleteEmailTemplateResponse);
+  rpc ListEmailTemplates (ListEmailTemplatesRequest) returns (ListEmailTemplatesResponse);
+  
+  // Email log operations
+  rpc GetEmailLog (GetEmailLogRequest) returns (GetEmailLogResponse);
+  rpc ListEmailLogs (ListEmailLogsRequest) returns (ListEmailLogsResponse);
+  rpc GetEmailStats (GetEmailStatsRequest) returns (GetEmailStatsResponse);
+}
