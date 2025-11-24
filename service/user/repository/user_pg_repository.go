@@ -4,9 +4,16 @@ import (
 	"context"
 	"go-clean-arch/database"
 	"go-clean-arch/domain"
+	"strings"
 
 	"gorm.io/gorm"
 )
+
+var userSearchableFields = map[string]string{ // map[StructField]DBColumn]
+	"first_name": "first_name",
+	"last_name":  "last_name",
+	"email":      "email",
+}
 
 type UserRepository struct {
 	sqlHandler *database.SQLHandler[domain.User, domain.UserFilter]
@@ -54,21 +61,10 @@ func applyFilter(qb *gorm.DB, filter *domain.UserFilter) *gorm.DB {
 		}
 	}
 	if filter.SearchTerm != nil && *filter.SearchTerm != "" {
-		searchFields := filter.SearchFields
-		if len(searchFields) == 0 {
-			searchFields = []string{"username", "email", "first_name", "last_name"}
+		searchTerm := strings.TrimSpace(*filter.SearchTerm)
+		if searchTerm != "" {
+			qb = database.ApplySearch(qb, searchTerm, filter.SearchFields, userSearchableFields)
 		}
-
-		searchQuery := ""
-		searchValues := []interface{}{}
-		for i, field := range searchFields {
-			if i > 0 {
-				searchQuery += " OR "
-			}
-			searchQuery += field + " ILIKE ?"
-			searchValues = append(searchValues, "%"+*filter.SearchTerm+"%")
-		}
-		qb = qb.Where(searchQuery, searchValues...)
 	}
 	if filter.IncludeDeleted == nil || !*filter.IncludeDeleted {
 		qb = qb.Where("deleted_at = 0")
@@ -97,10 +93,12 @@ func (r *UserRepository) FindPage(ctx context.Context, filter *domain.UserFilter
 	return r.sqlHandler.FindPage(ctx, filter, option)
 }
 
+// Update updates user with omitting password field
 func (r *UserRepository) Update(ctx context.Context, user *domain.User) error {
-	return r.sqlHandler.Update(ctx, user)
+	return r.sqlHandler.Update(ctx, user, database.WithOmit("Password"))
 }
 
+// UpdatePassword updates only password field of the user
 func (r *UserRepository) UpdatePassword(ctx context.Context, userID string, newPassword string) error {
 	return r.sqlHandler.UpdateFields(ctx, userID, map[string]any{
 		"password": newPassword,

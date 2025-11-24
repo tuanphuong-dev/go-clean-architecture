@@ -1,8 +1,11 @@
 package domain
 
 import (
+	"database/sql"
 	"database/sql/driver"
 	"encoding/json"
+	"fmt"
+	"time"
 
 	"github.com/pkg/errors"
 )
@@ -21,6 +24,7 @@ type FindOneOption struct {
 
 type FindManyOption struct {
 	Preloads []string `json:"preloads" form:"preloads"`
+	Joins    []string `json:"joins" form:"joins"`
 	Sort     []string `json:"sort" form:"sort"`
 	Limit    *int     `json:"limit" form:"limit" default:"10"`
 	Offset   *int     `json:"offset" form:"offset" default:"0"`
@@ -71,4 +75,66 @@ func (s *StringSlice) Scan(input interface{}) error {
 		return errors.New("type assertion to []byte failed")
 	}
 	return json.Unmarshal(b, s)
+}
+
+type Pagination struct {
+	Page       int   `json:"page"`
+	PerPage    int   `json:"per_page"`
+	TotalPages int   `json:"total_pages"`
+	TotalItems int64 `json:"total_items"`
+}
+
+func NewPagination(page, perPage int, totalItems int64) *Pagination {
+	totalPages := int((totalItems + int64(perPage) - 1) / int64(perPage))
+	return &Pagination{
+		Page:       page,
+		PerPage:    perPage,
+		TotalPages: totalPages,
+		TotalItems: totalItems,
+	}
+}
+
+type Date time.Time
+
+func (date Date) String() string {
+	t := time.Time(date)
+	return t.Format("02/01/2006")
+}
+
+func (date Date) IsZero() bool {
+	t := time.Time(date)
+	return t.IsZero()
+}
+
+func (date *Date) Scan(value interface{}) (err error) {
+	nullTime := &sql.NullTime{}
+	err = nullTime.Scan(value)
+	*date = Date(nullTime.Time)
+	return
+}
+
+func (date Date) Value() (driver.Value, error) {
+	y, m, d := time.Time(date).Date()
+	return time.Date(y, m, d, 0, 0, 0, 0, time.Time(date).Location()), nil
+}
+
+func (date Date) GormDataType() string {
+	return "date"
+}
+
+func (date Date) MarshalJSON() ([]byte, error) {
+	t := time.Time(date)
+	formatted := t.Format("02/01/2006")
+	return []byte(`"` + formatted + `"`), nil
+}
+
+func (date *Date) UnmarshalJSON(b []byte) error {
+	s := string(b)
+	s = s[1 : len(s)-1]
+	t, err := time.Parse("02/01/2006", s)
+	if err != nil {
+		return fmt.Errorf("date must be dd/mm/yyyy: %w", err)
+	}
+	*date = Date(t)
+	return nil
 }
